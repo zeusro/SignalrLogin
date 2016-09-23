@@ -1,0 +1,65 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+
+</head>
+<body>
+    <div>
+        <div id="divQRCode"></div>
+    </div>
+    <script src="~/Scripts/jquery-3.1.0.min.js"></script>
+    <script src="~/Scripts/qrcode.min.js"></script>
+    <script src="~/Scripts/jquery.qrcode.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script  src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+
+        var codeUUID = "";
+        $(function () {
+
+            // Reference the auto-generated proxy for the hub.
+            var qrcode = $.connection.qRCodeHub;
+            // Create a function that the hub can call back to display messages.
+            qrcode.client.addNewMessageToPage = function (name, message) {
+                // Add the message to the page.
+                console.log(message);
+                //jQuery('#divQRCode').qrcode({ width: 180, height: 180, correctLevel: 0, text: message });
+            };
+            qrcode.client.sendElapsedTime = function (time) {
+                console.log(time);
+            };
+            qrcode.client.sendQRCodeUUID = function (uuid) {
+                console.log("sendQRCodeUUID");
+                console.log(codeUUID);
+                if (codeUUID === uuid) {
+                    return;
+                }
+                codeUUID = uuid;
+                if (codeUUID !== "ERROR") {
+                    var jsonUUID = $.parseJSON(codeUUID);
+                    if (jsonUUID.islogin === 1) { //判断是否登录
+                        window.location.href = "/Home/Index/";
+                    }
+                }
+                $("#divQRCode").html("");
+                $('#divQRCode').qrcode({ width: 180, height: 180, correctLevel: 0, text: codeUUID });
+
+            };
+            // Start the connection.
+            $.connection.hub.start().done(function () {
+                //qrcode.server.updateConnectionId($.connection.hub.id);
+                qrcode.server.send("qrcode", Math.random());
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using SignalrLogin.Models;
 
 namespace SignalrLogin.Controllers
 {
@@ -27,13 +28,13 @@ namespace SignalrLogin.Controllers
 
             #region 参数验证
 
-            if (model.IsNull())
+            if (model == null)
             {
                 result.Result = -1;
                 result.Message = "参数错误";
                 return result;
             }
-            if (model.ConnectionId.IsNullOrEmpty() || model.UUID.Equals(Guid.Empty) || model.UserName.IsNullOrEmpty() || model.Password.IsNullOrEmpty())
+            if (String.IsNullOrWhiteSpace(model.ConnectionId) || model.UUID.Equals(Guid.Empty) || String.IsNullOrWhiteSpace(model.UserName) || String.IsNullOrWhiteSpace(model.Password))
             {
                 result.Result = -2;
                 result.Message = "ConnectionId、UUID、UserName、Password不允许为空";
@@ -73,42 +74,11 @@ namespace SignalrLogin.Controllers
             }
 
             #endregion 有效性判断
-
-            LoginUserNameInput loginParam = new LoginUserNameInput
-            {
-                UserName = model.UserName,
-                Password = model.Password,
-                Platform = model.Platform
-            };
-            LoginOutput loginResult = await new SessionController().LoginUserName(loginParam);
-            switch (loginResult.Result)
-            {
-                case -1:
-                    result.Result = -7;
-                    result.Message = "登录账号已停用";
-                    break;
-
-                case -2:
-                    result.Result = -8;
-                    result.Message = "登录账号已删除";
-                    break;
-
-                case -3:
-                    result.Result = -9;
-                    result.Message = "登录密码输入错误";
-                    break;
-
-                case -4:
-                    result.Result = -10;
-                    result.Message = "登录账号不存在";
-                    break;
-            }
-            if (loginResult.Result > 0) //登录成功，值为AccId
-            {
-                result.Result = 0;
-                findCode.IsLogin = true; //更改登录状态
-                result.Message = "成功登录";
-            }
+            //todo:判断
+            string token = "";
+            result.Result = 0;
+            findCode.IsLogin = true; //更改登录状态
+            result.Message = "成功登录";
             return result;
         }
     }

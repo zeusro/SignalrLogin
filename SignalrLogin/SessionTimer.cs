@@ -18,10 +18,7 @@ namespace SignalrLogin
             Timers = new ConcurrentDictionary<string, SessionTimer>();
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="connectionId"></param>
+     
         private SessionTimer(string connectionId)
         {
             ConnectionId = connectionId;
